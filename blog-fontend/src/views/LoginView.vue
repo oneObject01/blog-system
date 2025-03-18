@@ -43,6 +43,7 @@
   import { ref } from 'vue'
   import { ElMessage } from 'element-plus'
   import router from '@/router'
+  import auth from '@/request/apis/auth'
 
   
   let loading = ref(false)
@@ -54,29 +55,11 @@
   const onSubmit = async () => {
     try {
     loading.value = true
-    const response = await fetch('http://localhost:3000/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form.value)
-    })
-
-    if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || '登录失败')
-  }
-
+    await auth.login(form.value)
     router.push('/')
     console.log('登录成功')
   } catch (error) {
-    let message = (error as {message:string}).message
-    console.log('错误信息：', error)
-    if ((error as {message:string}).message.includes('Failed to fetch')) {
-      message = '网络连接失败，请检查网络设置'
-    }
-    
-    ElMessage.error(message)
+    console.error('登录失败:', error)
   }finally {
     loading.value = false
   }

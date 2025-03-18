@@ -20,7 +20,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, '密码不能为空'],
     match: [/^\w{6,18}$/, '6-18位字母数字组合']
-  }
+  },
+  originAt: { 
+    type: Date, default: 
+    Date.now 
+  },
 });
 
 // 密码加密中间件（保持不变）

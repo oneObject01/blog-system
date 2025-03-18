@@ -62,6 +62,7 @@ import { ref } from 'vue'
 import  {type FormInstance,ElMessage } from 'element-plus'
 import router from '@/router'
 import type { FormItemRule } from 'element-plus'
+import auth from '@/request/apis/auth'
 
   
   const form = ref({
@@ -106,30 +107,13 @@ const submitForm = async () => {
     loading.value = true
     // 触发表单验证
     await formRef.value?.validate()
-    const response = await fetch('http://localhost:3000/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form.value)
-    })
-
-    if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || '注册失败')
-  }
+    await auth.register(form.value)
     // 只有当所有验证通过才会执行到这里
     router.push('/login')
     console.log('验证通过，可以提交了')
   } catch (error) {
     // 验证失败时自动进入这里
-    let message = (error as {message:string}).message
-    console.log('错误信息：', error)
-    if ((error as {message:string}).message.includes('Failed to fetch')) {
-      message = '网络连接失败，请检查网络设置'
-    }
-    
-    ElMessage.error(message)
+    console.error('验证失败', error)
   }finally {
     loading.value = false
   }
