@@ -103,8 +103,7 @@ const login = async (req, res) => {
     
         // 密码验证通过，返回成功信息
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        return res.status(200).json({ success: true, message: '登录成功', token });
-    
+        return res.status(200).json({ success: true, message: '登录成功', token ,data:user.username});
       }catch(error){
           console.error('登录错误:', error);
           return res.status(500).json({ success: false, message: '服务器错误，请稍后再试' });

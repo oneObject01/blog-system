@@ -41,10 +41,11 @@
   <script setup lang="ts">
   import { Lock, Phone } from '@element-plus/icons-vue'
   import { ref } from 'vue'
-  import { ElMessage } from 'element-plus'
   import router from '@/router'
   import auth from '@/request/apis/auth'
+  import { useUserStore } from '@/stores/userStore'
 
+  const userStore = useUserStore()
   
   let loading = ref(false)
   const form = ref({
@@ -55,9 +56,11 @@
   const onSubmit = async () => {
     try {
     loading.value = true
-    await auth.login(form.value)
+    const username = await auth.login(form.value)
+    userStore.login(username as any)
+    console.log('登录成功:', username)
+    await localStorage.setItem('username', username as any)
     router.push('/')
-    console.log('登录成功')
   } catch (error) {
     console.error('登录失败:', error)
   }finally {

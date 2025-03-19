@@ -8,13 +8,13 @@ import axios, {
   import { ElMessage } from 'element-plus'
   import router from '@/router'
   
-  // 定义后端响应数据格式
-  interface ApiResponse<T = any> {
-    code: number
-    data: T
-    message?: string
-    [key: string]: any // 允许其他扩展字段
-  }
+// 定义后端响应数据格式
+interface ApiResponse<T = any> {
+    code: number;
+    data: T;
+    message?: string;
+    [key: string]: any; // 允许其他扩展字段
+}
   
   // 创建 Axios 实例
   const http: AxiosInstance = axios.create({
@@ -33,6 +33,15 @@ import axios, {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
+
+          // 根据请求数据类型动态设置 Content-Type
+    if (config.data instanceof FormData) {
+      // 上传文件时设置为 multipart/form-data
+      config.headers['Content-Type'] = 'multipart/form-data';
+    } else {
+      // 其他情况使用默认的 application/json
+      config.headers['Content-Type'] = 'application/json;charset=UTF-8';
+    }
       return config
     },
     (error: AxiosError) => {
@@ -42,19 +51,20 @@ import axios, {
   
   // 响应拦截器
   http.interceptors.response.use(
-    (response: AxiosResponse<ApiResponse>) => {
+    (response: AxiosResponse) => {
       // 处理二进制数据
       if (response.request.responseType === 'blob') {
         return response.data
       }
   
       // 处理业务逻辑
-      const { success,data,message: msg, token} = response.data
+      const { success,message: msg, token} = response.data
       if (success === true) {
         if (token) {
           localStorage.setItem('ACCESS_TOKEN', token)
         }
-        return data
+        console.log('响应数据',response.data)
+        return response.data
       } else {
         ElMessage.error(msg || '操作失败')
         return Promise.reject(new Error(msg || '请求错误'))

@@ -5,12 +5,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/authRoutes');
+const updateRoutes = require('./routes/updateRoutes');
 
 const app = express();
 
 // 中间件
 app.use(bodyParser.json());
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 // 连接 MongoDB
 mongoose.connect('mongodb://localhost:27017/userDB', {
@@ -21,6 +23,8 @@ mongoose.connect('mongodb://localhost:27017/userDB', {
 .catch(err => console.error('MongoDB connection error:', err));
 
 app.use('/auth',authRoutes)
+app.use('/update',updateRoutes)
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

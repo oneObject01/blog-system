@@ -14,31 +14,55 @@
         </div>
         
         <div class="user-panel">
+          <div v-if="userStore.isLogin">
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                {{ userStore.username }}
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="toCreatePost">创建文章</el-dropdown-item>
+                  <el-dropdown-item @click="userStore.logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+          <div v-else>
             <router-link to="/login"><el-button type="primary">登录</el-button></router-link>
+          </div>     
         </div>
       </el-header>
-  
-      <!-- 内容区 -->
       <el-main class="main-content">
-        <h1>最新文章</h1>
-        <div class="article-list">
-          <!-- 文章卡片 -->
-          <el-card 
-            v-for="n in 3" 
-            :key="n" 
-            class="article-card"
-          >
-            <div class="article-header">
-              <h3>示例文章标题 {{ n }}</h3>
-              <span class="date">2023-08-01</span>
-            </div>
-            <p class="summary">这里是文章的摘要内容，用于简要介绍文章的主要内容...</p>
-          </el-card>
-        </div>
+        <router-view/>
       </el-main>
+
+
     </div>
   </template>
   
+  <script setup lang="ts">
+  import { useUserStore } from '@/stores/userStore';
+  import { onMounted, onUnmounted} from 'vue';
+  import router from '@/router';
+  import { RouterView } from 'vue-router';
+
+  const userStore = useUserStore()
+
+  onMounted(() => {
+    console.log(userStore.isLogin)
+    if(localStorage.getItem('ACCESS_TOKEN') && localStorage.getItem('username')){
+      userStore.refresh()
+    }
+  })
+  onUnmounted(()=>{
+    console.log(userStore.isLogin)
+  })
+
+  const toCreatePost = () => {
+    router.push('/create')
+  }
+  </script>
+
   <style scoped>
   .home-container {
     min-height: 100vh;
@@ -74,38 +98,13 @@
     margin-right: 30px;
   }
   
+  .user-panel .el-dropdown-link {
+    cursor: pointer;
+  }
+
   .main-content {
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px;
-  }
-  
-  .article-list {
-    display: grid;
-    gap: 20px;
-  }
-  
-  .article-card {
-    transition: transform 0.3s;
-  }
-  
-  .article-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  .article-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-  
-  .date {
-    color: #909399;
-    font-size: 14px;
-  }
-  
-  .summary {
-    color: #606266;
-    line-height: 1.6;
   }
   </style>
