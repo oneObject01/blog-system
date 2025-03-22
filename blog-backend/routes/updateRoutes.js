@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router();
 const update = require('../controllers/updateController')
-const upload = require('../middlewares/multer')
+const authenticate = require('../middlewares/authenticates')
 
-router.post('/image', upload.single('files[0]'),update.updateImage);
+router.post('/image',authenticate,update.updateImage);
+router.post('/post',authenticate,update.updatePost);
+
 
 module.exports = router;

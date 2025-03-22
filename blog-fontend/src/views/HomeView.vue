@@ -22,7 +22,7 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="toCreatePost">创建文章</el-dropdown-item>
-                  <el-dropdown-item @click="userStore.logout">退出登录</el-dropdown-item>
+                  <el-dropdown-item @click="userStore.leaveOut">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>

@@ -152,6 +152,8 @@ const handleSubmit = async () => {
       contentLength: contentLength.value
     });
 
+    await update.updatePost({articleForm});
+
     ElMessage.success('提交成功！');
     // 清空表单
     Object.assign(articleForm, {

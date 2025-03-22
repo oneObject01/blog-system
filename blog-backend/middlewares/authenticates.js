@@ -17,13 +17,11 @@ const authenticate = (req, res, next) => {
             throw new Error();
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = { _id: decoded.userId };
+        req.userId = { _id: decoded.userId };
         next();
     } catch (error) {
-        res.status(401).send({ message: 'Authentication failed' });
+        res.status(401).send({ message: '身份验证失败，请重新登录' });
     }
 };
 
-module.exports = {
-    authenticate
-};
+module.exports = authenticate;

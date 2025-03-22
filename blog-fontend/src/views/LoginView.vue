@@ -56,8 +56,9 @@
   const onSubmit = async () => {
     try {
     loading.value = true
-    const username = await auth.login(form.value)
-    userStore.login(username as any)
+    const response = await auth.login(form.value)
+    const username = response.data
+    userStore.comeIn(username as any)
     console.log('登录成功:', username)
     await localStorage.setItem('username', username as any)
     router.push('/')

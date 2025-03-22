@@ -7,12 +7,12 @@ export const useUserStore = defineStore('user', {
     username: '游客'
   }),
   actions: {
-    login(name:string) {
+    comeIn(name:string) {
         this.username = name
         this.isLogin = true
         ElMessage.success(`欢迎回来，${name}`)
     },
-    logout() {
+    leaveOut() {
         this.isLogin = false
         this.username = '游客'
         localStorage.removeItem('ACCESS_TOKEN')
