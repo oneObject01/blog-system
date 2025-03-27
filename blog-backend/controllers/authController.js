@@ -110,9 +110,27 @@ const login = async (req, res) => {
       }
 }
 
+const toAuth = async (req, res) => {
+  try {
+      const { userId } = req;
+  
+      const user = await User.findById({ userId });
+  
+      if (!user) {
+        return res.status(401).json({ success: false, message: '身份验证失败，请重新登录！'});
+      }
+      // 验证通过，返回成功信息
+      return res.status(200).json({ success: true, message: '验证成功' ,data:user.username});
+    }catch(error){
+        console.error('登录错误:', error);
+        return res.status(500).json({ success: false, message: '服务器错误，请稍后再试' });
+    }
+}
+
 const authController = {
     register,
-    login
+    login,
+    toAuth
 }
 
 module.exports = authController;

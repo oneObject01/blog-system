@@ -45,6 +45,8 @@
   import { onMounted, onUnmounted} from 'vue';
   import router from '@/router';
   import { RouterView } from 'vue-router';
+  import auth from '@/request/apis/auth'
+  import { ElMessage,ElMessageBox } from 'element-plus'
 
   const userStore = useUserStore()
 
@@ -58,8 +60,30 @@
     console.log(userStore.isLogin)
   })
 
-  const toCreatePost = () => {
-    router.push('/create')
+  const toCreatePost = async () => {
+    try{
+      const response = await auth.authenticate()
+      router.push('/create')
+    }catch(err){
+      ElMessageBox.confirm(
+        '身份验证已过期，是否重新登陆?',
+        '验证失败',
+        {
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+          type: 'error',
+        }
+      ).then(() => {
+          userStore.leaveOut()
+          router.push('/login')
+      }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '跳转失败',
+          })
+        })
+
+    }
   }
   </script>
 

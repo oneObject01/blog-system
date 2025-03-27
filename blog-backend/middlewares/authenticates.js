@@ -6,7 +6,6 @@ const authenticate = (req, res, next) => {
     try {
         // 先尝试从请求头中获取 Token
         if (req.header('Authorization')) {
-            console.log('req.header:', req.header('Authorization'));
             token = req.header('Authorization').split(' ')[1];
         } else {
             // 若请求头中没有 Token，则尝试从 Cookie 中获取

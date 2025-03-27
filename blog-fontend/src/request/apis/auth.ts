@@ -6,5 +6,8 @@ export default {
   },
   register(data: any) {
     return http.post('/auth/register', data);
-  }
+  },
+  authenticate() {
+    return http.get('/auth/authenticate');
+  },
 }

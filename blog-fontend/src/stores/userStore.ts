@@ -16,7 +16,6 @@ export const useUserStore = defineStore('user', {
         this.isLogin = false
         this.username = '游客'
         localStorage.removeItem('ACCESS_TOKEN')
-        ElMessage.success(`已退出登录`)
     },
     refresh(){
         if(localStorage.getItem('username')&&localStorage.getItem('ACCESS_TOKEN')){
