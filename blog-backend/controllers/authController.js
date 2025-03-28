@@ -102,7 +102,7 @@ const login = async (req, res) => {
         }
     
         // 密码验证通过，返回成功信息
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
         return res.status(200).json({ success: true, message: '登录成功', token ,data:user.username});
       }catch(error){
           console.error('登录错误:', error);
@@ -114,7 +114,7 @@ const toAuth = async (req, res) => {
   try {
       const { userId } = req;
   
-      const user = await User.findById({ userId });
+      const user = await User.findById(req.userId);
   
       if (!user) {
         return res.status(401).json({ success: false, message: '身份验证失败，请重新登录！'});

@@ -6,7 +6,7 @@ const updateImage = async (req, res) => {
     try {
       // 检查文件是否上传成功
       if (!req.file) {
-        return res.status(400).json({ code: 400, message: '未成功获取上传的图片' });
+        return res.status(400).json({ success:false,code: 400, message: '未成功获取上传的图片' });
       }
   
       // 保存图片信息到 MongoDB

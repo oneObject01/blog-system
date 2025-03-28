@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const busboyParse = require('./middlewares/busboy')
 const authRoutes = require('./routes/authRoutes');
 const updateRoutes = require('./routes/updateRoutes');
+const sendRoutes = require('./routes/sendRoutes');
 
 const app = express();
 
@@ -25,7 +26,7 @@ mongoose.connect('mongodb://localhost:27017/userDB', {
 
 app.use('/auth',authRoutes)
 app.use('/update',updateRoutes)
-
+app.use('/send',sendRoutes)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

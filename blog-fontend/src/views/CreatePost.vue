@@ -6,10 +6,10 @@
         <el-input
           v-model="articleForm.title"
           placeholder="请输入文章标题"
-          :maxlength="20"
+          :maxlength="50"
           @input="updateTitleLength"
         />
-        <span class="counter">{{ titleLength }}/20</span>
+        <span class="counter">{{ titleLength }}/50</span>
       </el-form-item>
 
       <!-- 摘要部分 -->
@@ -86,7 +86,7 @@ const contentLength = ref(0);
 // 处理图片上传
 const handleUploadImg = async (files: File[], callback: (urls: string[]) => void) => {
   console.log(callback)
-  // 步骤 1: 校验图片格式
+  // 校验图片格式
   const validFormats = ['image/png', 'image/jpeg'];
   const validFiles = files.filter(file => validFormats.includes(file.type));
 
@@ -95,17 +95,17 @@ const handleUploadImg = async (files: File[], callback: (urls: string[]) => void
     return;
   }
 
-  // 步骤 2: 创建表单数据
+  // 创建表单数据
   const formData = new FormData();
   validFiles.forEach((file, index) => {
     formData.append(`files[${index}]`, file);
   });
 
   try {
-    // 步骤 3: 发送 HTTP 请求
+    // 发送 HTTP 请求
     const reponse = await update.updateImg(formData);
     const data = reponse.data;
-    // 步骤 4: 处理后端响应
+    // 处理后端响应
     if (data && data.url) {
       const url = `http://localhost:3000${data.url}`;
       callback([url]);
@@ -113,7 +113,7 @@ const handleUploadImg = async (files: File[], callback: (urls: string[]) => void
       ElMessage.error('后端返回的响应格式不正确');
     }
   } catch (error) {
-    // 步骤 5: 错误处理
+    //错误处理
     console.error('图片上传失败:', error);
     ElMessage.error('图片上传失败，请重试');
   }

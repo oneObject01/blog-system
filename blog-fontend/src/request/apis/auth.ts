@@ -8,6 +8,6 @@ export default {
     return http.post('/auth/register', data);
   },
   authenticate() {
-    return http.get('/auth/authenticate');
+    return http.get('/auth/toAuth');
   },
 }

@@ -20,6 +20,7 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     HomePosts: typeof import('./src/components/homePosts.vue')['default']
+    PostCard: typeof import('./src/components/postCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

@@ -5,27 +5,49 @@
         <div class="article-list">
           <!-- 文章卡片 -->
           <el-card 
-            v-for="n in 3" 
-            :key="n" 
+            v-for="item in postIntroduct" 
+            :key="item._id" 
             class="article-card"
+            @click="router.push({
+              path:'/body',
+              query:{
+                postId:item._id,
+                title:item.title,
+                content:item.content,
+                author:item.author.username,
+                createdAt: item.createdAt.toString().substring(0, 10),
+              }
+            })"
           >
-            <div class="article-header">
-              <h3>示例文章标题 {{ n }}</h3>
-              <span class="date">2023-08-01</span>
-            </div>
-            <p class="summary">这里是文章的摘要内容，用于简要介绍文章的主要内容...</p>
+            <postCard :postIntroduct="item"/>
           </el-card>
         </div>
       </div>
 </template>
 
 <script setup lang="ts">
+import postCard from '@/components/postCard.vue'
+import { onMounted } from 'vue' 
+import send from '@/request/apis/send'
+import { ref } from 'vue'
+import router from '@/router'
+import { type Post,type User} from '@/types/type'
 
+
+const postIntroduct = ref<Post[]>([])
+
+onMounted(async ()=>{
+  try{
+    const response = await send.getPosts()
+    console.log("获取的文章简介",response)
+    postIntroduct.value = response.data
+  }catch(err){
+    console.error("获取文章失败",err)
+  }
+})
 </script>
 
-<style scoped>
-
-  
+<style scoped>  
   .article-list {
     display: grid;
     gap: 20px;
@@ -37,21 +59,8 @@
   
   .article-card:hover {
     transform: translateY(-3px);
+    cursor:pointer;
   }
   
-  .article-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-  
-  .date {
-    color: #909399;
-    font-size: 14px;
-  }
-  
-  .summary {
-    color: #606266;
-    line-height: 1.6;
-  }
+
 </style>
