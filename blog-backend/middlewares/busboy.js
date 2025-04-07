@@ -16,7 +16,7 @@ const busboyParse = (req, res, next)=>{
       });
 
       busboy.on('file', (fieldname, file, info) => {
-          const { encoding, mimeType } = info;
+          const { mimeType } = info;
           const filename = String(Date.now() + '-' + Math.round(Math.random() * 1E9))
           console.log(filename)
           const saveTo = path.join(process.cwd(), 'uploads', filename);

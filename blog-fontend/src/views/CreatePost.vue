@@ -25,6 +25,14 @@
         <span class="counter">{{ abstractLength }}/300</span>
       </el-form-item>
 
+      <!-- 标签选择部分 -->
+      <el-form-item label="文章标签">
+        <el-checkbox-group v-model="articleForm.tags" @change="checkTags">
+          <el-checkbox v-for="tag in availableTags" :label="tag" :key="tag">{{ tag }}</el-checkbox>
+        </el-checkbox-group>
+        <span v-if="!articleForm.tags.length" class="error-message">请至少选择一个标签</span>
+      </el-form-item>
+
       <!-- Markdown 编辑器 -->
       <el-form-item label="文章内容">
         <md-editor
@@ -65,13 +73,25 @@ interface ArticleForm {
   title: string;
   abstract: string;
   content: string;
+  tags: string[]; // 添加 tags 字段
 }
+
+// 可用标签列表
+const availableTags = [
+  // 编程语言
+  'Python', 'Java', 'JavaScript', 'C++', 'C#', 'Go', 'Ruby', 'Swift', 'Kotlin',
+  // 开发工具
+  'Visual Studio Code', 'IntelliJ IDEA', 'Eclipse', 'Git', 'Docker', 'Maven', 'Gradle', 'Webpack', 'JUnit',
+  // 技术领域
+  '人工智能', '机器学习', '深度学习', '大数据', '云计算', '区块链', '物联网', '前端开发', '后端开发', '移动开发', '数据库管理', '算法与数据结构', '操作系统', '网络编程'
+];
 
 // 响应式数据
 const articleForm = reactive<ArticleForm>({
   title: '',
   abstract: '',
-  content: ''
+  content: '',
+  tags: []
 });
 
 // 表单引用
@@ -118,6 +138,7 @@ const handleUploadImg = async (files: File[], callback: (urls: string[]) => void
     ElMessage.error('图片上传失败，请重试');
   }
 };
+
 // 更新标题字数
 const updateTitleLength = () => {
   titleLength.value = articleForm.title.length;
@@ -127,10 +148,18 @@ const updateTitleLength = () => {
 const updateAbstractLength = () => {
   abstractLength.value = articleForm.abstract.length;
 };
+
 // 更新内容长度
 const updateContentChange = (newContent: string) => {
   articleForm.content = newContent;
   contentLength.value = newContent.length;
+};
+
+// 检查是否至少选择了一个标签
+const checkTags = () => {
+  if (!articleForm.tags.length) {
+    ElMessage.warning('请至少选择一个标签');
+  }
 };
 
 // 提交处理
@@ -144,6 +173,9 @@ const handleSubmit = async () => {
     }
     if (!articleForm.content.trim()) {
       return ElMessage.error('请输入文章内容');
+    }
+    if (!articleForm.tags.length) {
+      return ElMessage.error('请至少选择一个标签');
     }
 
     // 这里添加实际提交逻辑
@@ -159,8 +191,12 @@ const handleSubmit = async () => {
     Object.assign(articleForm, {
       title: '',
       abstract: '',
-      content: ''
+      content: '',
+      tags: []
     });
+    updateTitleLength()
+    updateAbstractLength()
+    updateContentChange('')
   } catch (err) {
     ElMessage.error('提交失败，请重试');
   } finally {
@@ -185,6 +221,13 @@ const handleSubmit = async () => {
   margin-left: 10px;
   font-size: 12px;
   color: #909399;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  display: block;
+  margin-top: 5px;
 }
 
 /* 编辑器样式调整 */

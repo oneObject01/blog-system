@@ -52,4 +52,5 @@ const updatePost = async (req, res) => {
     });
   }
 };
-  module.exports = { updateImage,updatePost};
+
+module.exports = { updateImage,updatePost};

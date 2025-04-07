@@ -2,7 +2,7 @@
 <template>
     <div class="home-container">
       <!-- 导航栏 -->
-      <el-header class="header">
+      <el-header class="header fixed-header">
         <div class="logo">
           <!-- <img src="@/assets/logo.png" alt="博客系统"> -->
         </div>
@@ -22,7 +22,8 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="toCreatePost">创建文章</el-dropdown-item>
-                  <el-dropdown-item @click="userStore.leaveOut">退出登录</el-dropdown-item>
+                  <el-dropdown-item @click="toPersonalCenter">个人中心</el-dropdown-item>
+                  <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -33,9 +34,9 @@
         </div>
       </el-header>
       <el-main class="main-content">
+        <div class="header-pag"></div>
         <router-view/>
       </el-main>
-
 
     </div>
   </template>
@@ -60,6 +61,31 @@
     console.log(userStore.isLogin)
   })
 
+  const toPersonalCenter = async () => {
+    try{
+      const response = await auth.authenticate()
+      router.push('/personalCenter')
+    }catch(err){
+      ElMessageBox.confirm(
+        '身份验证已过期，是否重新登陆?',
+        '验证失败',
+        {
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+          type: 'error',
+        }
+      ).then(() => {
+          userStore.leaveOut()
+          router.push('/login')
+      }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '跳转失败',
+          })
+        })
+    }
+  }
+
   const toCreatePost = async () => {
     try{
       const response = await auth.authenticate()
@@ -82,8 +108,26 @@
             message: '跳转失败',
           })
         })
-
     }
+  }
+
+  const logout = async()=>{
+    ElMessageBox.confirm(
+      '是否确认退出',
+      {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'error',
+      }
+    ).then(()=>{
+      userStore.leaveOut()
+      router.push('/login')
+    }).catch(()=>{
+      ElMessage({
+        type: 'info',
+        message: '退出失败',
+      })
+    })
   }
   </script>
 
@@ -97,6 +141,14 @@
     align-items: center;
     background: #fff;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
   }
   
   .logo img {
@@ -129,6 +181,6 @@
   .main-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 30px;
+    padding: 80px;
   }
   </style>

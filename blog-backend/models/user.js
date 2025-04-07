@@ -34,4 +34,5 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.index({username:'text'})
 module.exports = mongoose.model('User', userSchema);

@@ -5,6 +5,7 @@ export interface Post {
     content: string;
     author: User;
     createdAt: Date;
+    tags:string[];
 }
 
 export interface User{
@@ -13,6 +14,7 @@ export interface User{
     phone: string;
     password: string;
 }
+
 
  
   

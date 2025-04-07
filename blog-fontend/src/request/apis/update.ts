@@ -6,5 +6,8 @@ export default {
     },
     updatePost(data: any){
         return http.post('/update/post', data)
+    },
+    updatePostScore(data: any){
+        return http.post('/update/post/score', data)
     }
   }

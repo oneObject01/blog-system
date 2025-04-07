@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router();
-const send = require('../controllers/sendController')
+const remove = require('../controllers/deleteController')
 const authenticate = require('../middlewares/authenticates')
 
-router.get('/post', send.sendPosts)
-router.get('/personal', authenticate, send.sendPersonalPosts)
+router.get('/post', authenticate,remove.deletePost)
 
 module.exports = router

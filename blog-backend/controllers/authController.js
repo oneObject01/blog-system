@@ -112,8 +112,6 @@ const login = async (req, res) => {
 
 const toAuth = async (req, res) => {
   try {
-      const { userId } = req;
-  
       const user = await User.findById(req.userId);
   
       if (!user) {
