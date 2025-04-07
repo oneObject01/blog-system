@@ -127,7 +127,8 @@ const handleUploadImg = async (files: File[], callback: (urls: string[]) => void
     const data = reponse.data;
     // 处理后端响应
     if (data && data.url) {
-      const url = `http://localhost:3000${data.url}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}${data.url}`;
+      console.log('图片上传成功，URL:', url);
       callback([url]);
     } else {
       ElMessage.error('后端返回的响应格式不正确');
