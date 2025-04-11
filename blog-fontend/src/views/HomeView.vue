@@ -61,55 +61,33 @@
     console.log(userStore.isLogin)
   })
 
-  const toPersonalCenter = async () => {
-    try{
-      const response = await auth.authenticate()
-      router.push('/personalCenter')
-    }catch(err){
-      ElMessageBox.confirm(
-        '身份验证已过期，是否重新登陆?',
-        '验证失败',
-        {
-          confirmButtonText: '是',
-          cancelButtonText: '否',
-          type: 'error',
-        }
-      ).then(() => {
-          userStore.leaveOut()
-          router.push('/login')
-      }).catch(() => {
-          ElMessage({
-            type: 'info',
-            message: '跳转失败',
-          })
-        })
-    }
+  const handleAuthAndNavigate = async (targetRoute: string) => {
+  try {
+    await auth.authenticate();
+    router.push(targetRoute);
+  } catch (err) {
+    ElMessageBox.confirm(
+      '身份验证失败，是否重新登陆?',
+      '验证失败',
+      {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'error',
+      }
+    ).then(() => {
+      router.push('/login');
+    }).catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '跳转失败',
+      });
+    });
+    userStore.leaveOut();
   }
+};
 
-  const toCreatePost = async () => {
-    try{
-      const response = await auth.authenticate()
-      router.push('/create')
-    }catch(err){
-      ElMessageBox.confirm(
-        '身份验证已过期，是否重新登陆?',
-        '验证失败',
-        {
-          confirmButtonText: '是',
-          cancelButtonText: '否',
-          type: 'error',
-        }
-      ).then(() => {
-          userStore.leaveOut()
-          router.push('/login')
-      }).catch(() => {
-          ElMessage({
-            type: 'info',
-            message: '跳转失败',
-          })
-        })
-    }
-  }
+const toPersonalCenter = () => handleAuthAndNavigate('/personalCenter');
+const toCreatePost = () => handleAuthAndNavigate('/create');
 
   const logout = async()=>{
     ElMessageBox.confirm(

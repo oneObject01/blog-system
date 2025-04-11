@@ -18,7 +18,8 @@ defineProps({
 
 const getTagType = (index: number): 'success' | 'info' | 'warning' | 'danger' | 'primary' => {
   const types: ('success' | 'info' | 'warning' | 'danger' | 'primary')[] = ['success', 'info', 'warning', 'danger', 'primary'];
-  return types[index % types.length];
+  const validIndex = Math.abs(index % types.length); // 确保索引为正
+  return types[validIndex];
 };
 </script>
 

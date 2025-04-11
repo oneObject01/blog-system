@@ -3,7 +3,8 @@ const router = express.Router();
 const send = require('../controllers/sendController')
 const authenticate = require('../middlewares/authenticates')
 
-router.get('/post', send.sendPosts)
+router.get('/posts', send.sendPosts)
+router.get('/post', send.sendPost)
 router.get('/personal', authenticate, send.sendPersonalPosts)
 
 module.exports = router

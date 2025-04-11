@@ -7,7 +7,7 @@
         <el-tag
           v-for="tag in availableTags"
           :key="tag"
-          :type="selectedTags.includes(tag) ? 'primary' : ''"
+          type="primary"
           @click="toggleTag(tag)"
           :class="{ 'selected-tag': selectedTags.includes(tag) }" 
           size="large"
@@ -15,7 +15,7 @@
           {{ tag }}
         </el-tag>
       </div>
-      <el-button calss="clear-button" @click="clearSelectedTags" type="danger">一键清除</el-button>
+      <el-button class="clear-button" @click="clearSelectedTags" type="danger">一键清除</el-button>
     </div>
     <!-- 内容区 -->
     <div class="home-posts">
@@ -41,14 +41,6 @@
             path:'/body',
             query:{
               postId:item._id,
-              title:item.title,
-              content:item.content,
-              author:item.author.username,
-              createdAt: item.createdAt.toString().substring(0, 10),
-              tags:item.tags,
-              likeCount: item.likeCount,
-              dislikeCount: item.dislikeCount,
-              collectionCount:item.collectionCount,
             }
           })"
         >
@@ -214,7 +206,7 @@ onUnmounted(() => {
 }
 
 .clear-button {
-  width: 100%;
+  width: 80%;
   border: none;
   transition: background-color 0.3s;
 }

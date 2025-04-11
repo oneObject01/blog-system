@@ -65,6 +65,23 @@ const sendPosts = async (req, res) => {
     }
 };
 
+const sendPost = async (req, res) => {
+    try {
+        const postId = req.query.postId;
+        const post = await Post.findById(postId).populate('author');
+        if (!post) {
+            return res.status(404).json({ error: '文章不存在' });
+        }
+        res.status(200).json({
+            success: true,
+            data: post,
+            message: '文章获取成功'
+        })
+    }catch (error) {
+        res.status(500).json({ error: '文章获取失败' });
+    }
+}
+
 const sendPersonalPosts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -82,5 +99,6 @@ const sendPersonalPosts = async (req, res) => {
 
 module.exports = {
     sendPosts,
+    sendPost,
     sendPersonalPosts
 };

@@ -8,7 +8,7 @@ export interface Post {
     tags:string[];
     likeCount: number;
     dislikeCount: number;
-    collectionCount:number;
+    favoriteCount:number;
 }
 
 export interface User{
