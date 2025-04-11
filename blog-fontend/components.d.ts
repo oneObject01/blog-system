@@ -22,6 +22,7 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
+    ElTag: typeof import('element-plus/es')['ElTag']
     HomePosts: typeof import('./src/components/homePosts.vue')['default']
     PostCard: typeof import('./src/components/postCard.vue')['default']
     PostTags: typeof import('./src/components/postTags.vue')['default']

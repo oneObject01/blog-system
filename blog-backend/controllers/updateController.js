@@ -53,4 +53,8 @@ const updatePost = async (req, res) => {
   }
 };
 
-module.exports = { updateImage,updatePost};
+const updateScore = async (req, res) => {
+console.log(req.body)
+}
+
+module.exports = { updateImage,updatePost,updateScore};

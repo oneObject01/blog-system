@@ -17,8 +17,11 @@ const sendPosts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const keyword = req.query.keyword || '';
+        const tags = req.query.tags || [];
 
         let query = {};
+        let conditions = [];
+
         if (keyword) {
             // 根据 title 字段进行模糊匹配
             const titleQuery = { title: { $regex: keyword, $options: 'i' } };
@@ -31,21 +34,24 @@ const sendPosts = async (req, res) => {
                 authorQuery = { author: { $in: userIds } };
             }
 
-            // 使用 $or 操作符组合两个查询条件
-            const orConditions = [];
             if (Object.keys(titleQuery).length > 0) {
-                orConditions.push(titleQuery);
+                conditions.push(titleQuery);
             }
             if (Object.keys(authorQuery).length > 0) {
-                orConditions.push(authorQuery);
+                conditions.push(authorQuery);
             }
+        }
 
-            // 如果 orConditions 数组不为空，才使用 $or 操作符
-            if (orConditions.length > 0) {
-                query = {
-                    $or: orConditions
-                };
-            }
+        if (tags.length > 0) {
+            // 确保文章的 tags 包含所有用户选择的 tags
+            const tagQuery = { tags: { $all: tags } };
+            conditions.push(tagQuery);
+        }
+
+        if (conditions.length > 0) {
+            query = {
+                $and: conditions
+            };
         }
 
         const posts = await findPostsByPage(page, limit, query);

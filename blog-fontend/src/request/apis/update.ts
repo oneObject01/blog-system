@@ -8,6 +8,6 @@ export default {
         return http.post('/update/post', data)
     },
     updatePostScore(data: any){
-        return http.post('/update/post/score', data)
+        return http.post('/update/score', data)
     }
   }

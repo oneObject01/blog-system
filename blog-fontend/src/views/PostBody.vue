@@ -14,7 +14,7 @@
         <!-- 使用 v-html 渲染转换后的内容 -->
         <div class="markdown-body" v-html="renderedContent"></div>
       </div>
-      <div class="article-actions" @click="handleUpdateScore">
+      <div class="article-actions">
         <div class="action-item" @click="handleLike" :class="{ active: isLiked }">
           <el-icon :size="20"><CaretTop /></el-icon>
           <span>{{ likeCount }}</span>
@@ -80,6 +80,7 @@
         updatedScore.dislikeCount = -1
       }
     }
+    handleUpdateScore()
   };
 
   // 处理点踩
@@ -105,6 +106,7 @@
         updatedScore.favoriteCount = -1
       }
     }
+    handleUpdateScore()
   };
 
   // 处理收藏
@@ -124,6 +126,7 @@
         updatedScore.dislikeCount = -1
       }
     }
+    handleUpdateScore()
   };
 
   const handleUpdateScore = () => {

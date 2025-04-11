@@ -134,6 +134,7 @@
   <style scoped>
   .home-container {
     min-height: 100vh;
+    background-color: #f9f9f9;
   }
   
   .header {

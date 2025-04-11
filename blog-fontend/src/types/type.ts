@@ -6,6 +6,9 @@ export interface Post {
     author: User;
     createdAt: Date;
     tags:string[];
+    likeCount: number;
+    dislikeCount: number;
+    collectionCount:number;
 }
 
 export interface User{
