@@ -18,13 +18,30 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, '密码不能为空'],
-    match: [/^\w{6,18}$/, '6-18位字母数字组合']
+    required: [true, '密码不能为空']
   },
   originAt: { 
-    type: Date, default: 
-    Date.now 
+    type: Date, 
+    default:Date.now, 
   },
+  likedPosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }
+  ],
+  favoritePosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }
+  ],
+  dislikePosts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }
+  ]
 });
 
 // 密码加密中间件（保持不变）

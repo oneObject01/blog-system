@@ -97,8 +97,47 @@ const sendPersonalPosts = async (req, res) => {
     }
 };
 
+const sendUserMark = async (req, res) => {
+    try{
+        const postId = req.query.postId;
+        const user = await User.findById(req.userId);
+        let isLiked = false, isDisliked = false, isFavorited = false;
+        if (!user) {
+            return res.status(404).json({ success: false, message: '用户不存在' });
+        }
+        if (user.likedPosts.includes(postId)) {
+            isLiked = true;
+        }else{
+            isLiked = false;
+        }
+        if(user.dislikePosts.includes(postId)){
+            isDisliked = true;
+        }else{
+            isDisliked = false;
+        }
+        if(user.favoritePosts.includes(postId)){
+            isFavorited = true;
+        }else{
+            isFavorited = false;
+        }
+        res.status(200).json({
+            success: true,
+            data: {
+                isLiked,
+                isDisliked,
+                isFavorited
+            },
+            message: '文章发送成功'
+        });
+    }catch (error) {
+        console.error("错误信息",error)
+        res.status(500).json({ error: '服务器崩溃' });
+    }
+}
+
 module.exports = {
     sendPosts,
     sendPost,
-    sendPersonalPosts
+    sendPersonalPosts,
+    sendUserMark
 };

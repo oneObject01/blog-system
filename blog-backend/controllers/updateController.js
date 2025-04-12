@@ -54,31 +54,77 @@ const updatePost = async (req, res) => {
 };
 
 const updateScore = async (req, res) => {
-try {
-  const { postId, cLikeCount,cDislikeCount,cFavoriteCount} = req.body;
-  const post = await Post.findById(postId);
-  if (!post) {
-    return res.status(404).json({ success: false, message: '文章不存在' });
+  try {
+      const { postId, cLikeCount, cDislikeCount, cFavoriteCount } = req.body;
+      const user = await User.findById(req.userId);
+      const post = await Post.findById(postId);
+      if (!post) {
+          return res.status(404).json({ success: false, message: '文章不存在' });
+      }
+      if (!user) {
+          return res.status(404).json({ success: false, message: '用户不存在' });
+      }
+      const { Types: { ObjectId } } = require('mongoose');
+
+      if (!ObjectId.isValid(postId)) {
+        return res.status(400).json({ message: "无效的文章 ID" });
+      }
+      if (cLikeCount !== undefined) {
+          post.likeCount += cLikeCount;
+          if (cLikeCount === 1) {
+              await User.updateOne(
+                { _id: req.userId },
+                { $addToSet: { likedPosts: postId } } // 自动去重
+              );
+          } else if (cLikeCount === -1) {
+              await User.updateOne(
+                { _id: req.userId },
+                { $pull: { likedPosts: postId } }
+              );
+          }
+          await user.save();
+      }
+      if (cDislikeCount !== undefined) {
+        post.dislikeCount += cDislikeCount;
+        if (cDislikeCount === 1) {
+            await User.updateOne(
+              { _id: req.userId },
+              { $addToSet: { dislikePosts: postId } } // 自动去重
+            );
+        } else if (cDislikeCount === -1) {
+            await User.updateOne(
+              { _id: req.userId },
+              { $pull: { dislikePosts: postId } }
+            );
+        }
+        await user.save();
+      }
+      if (cFavoriteCount !== undefined) {
+          post.favoriteCount += cFavoriteCount;
+          if (cFavoriteCount === 1) {
+            await User.updateOne(
+              { _id: req.userId },
+              { $addToSet: { favoritePosts: postId } } // 自动去重
+            );
+        } else if (cFavoriteCount === -1) {
+            await User.updateOne(
+              { _id: req.userId },
+              { $pull: { favoritePosts: postId } }
+            );
+        }
+        await user.save();
+      }
+      await post.save();
+      res.json({ success: true, code: 200, message: '文章点赞成功', data: { cLikeCount, cDislikeCount, cFavoriteCount } });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          success: false,
+          code: 500,
+          message: '服务器内部错误',
+          error: error.message
+      });
   }
-  if (cLikeCount !== undefined) {
-    post.likeCount += cLikeCount;
-  }
-  if (cDislikeCount !== undefined) {
-    post.dislikeCount += cDislikeCount;
-  }
-  if (cFavoriteCount !== undefined) {
-    post.favoriteCount += cFavoriteCount;
-  }
-  await post.save();
-  res.json({ success: true, code: 200, message: '文章点赞成功' ,data:{cLikeCount,cDislikeCount,cFavoriteCount}});
-}catch (error) {
-  res.status(500).json({
-    success: false, 
-    code: 500, 
-    message: '服务器内部错误', 
-    error: error.message 
-  });
-}
-}
+};
 
 module.exports = { updateImage,updatePost,updateScore};

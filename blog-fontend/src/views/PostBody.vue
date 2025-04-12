@@ -44,6 +44,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import auth from '../request/apis/auth';
 import { useUserStore } from '../stores/userStore';
+import { ca } from 'element-plus/es/locales.mjs';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -85,6 +86,23 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error("获取文章失败", err);
+  }
+  try{
+    if(userStore.isLogin){
+      const res = await send.getUserMark(route.query.postId as string);
+      console.log(res)
+      if (res.data.isLiked) {
+        isLiked.value = true;
+      }
+      if (res.data.isDisliked) {
+        isDisliked.value = true;
+      }
+      if (res.data.isFavorited) {
+        isFavorited.value = true;
+      }
+    }
+  }catch(err){
+    console.error("获取用户标记失败", err);
   }
 });
 

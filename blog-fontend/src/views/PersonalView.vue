@@ -1,7 +1,21 @@
 <template>
+  <div class="home-container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <h2>菜单</h2>
+      <el-menu
+        default-active="1"
+        class="personal-sidebar"
+        mode="vertical"
+      >
+        <el-menu-item index="1">我的文章</el-menu-item>
+        <el-menu-item index="2">我的点赞</el-menu-item>
+        <el-menu-item index="3">我的收藏</el-menu-item>
+      </el-menu>
+    </div>
     <!-- 内容区 -->
     <div class="home-posts">
-      <h1>个人中心</h1>
+      <h1 class="page-title">我的文章</h1>
       <div class="article-list">
         <!-- 文章卡片 -->
         <el-card 
@@ -29,6 +43,7 @@
       <div v-if="loading" class="loading">加载中...</div>
       <div v-if="!hasMore && postIntroducts.length > 0" class="no-more">没有更多文章了</div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -48,35 +63,36 @@ const hasMore = ref(true)
 const pageSize = 10
 
 const loadMorePosts = async () => {
-if (loading.value || !hasMore.value) return
-loading.value = true
-try {
-  const response = await send.getPersonalPosts(page.value)
-  const posts = response.data as Post[]
-  if (posts.length > 0) {
-    postIntroducts.value = [...postIntroducts.value, ...posts]
-    hasMore.value = posts.length === pageSize
-    page.value++
-  } else {
-    hasMore.value = false
+  if (loading.value || !hasMore.value) return
+  loading.value = true
+  try {
+    const response = await send.getPersonalPosts(page.value)
+    const posts = response.data as Post[]
+    if (posts.length > 0) {
+      postIntroducts.value = [...postIntroducts.value, ...posts]
+      hasMore.value = posts.length === pageSize
+      page.value++
+    } else {
+      hasMore.value = false
+    }
+  } catch(err) {
+    console.error("获取更多文章失败", err)
+  } finally {
+    loading.value = false
   }
-} catch(err) {
-  console.error("获取更多文章失败", err)
-} finally {
-  loading.value = false
-}
 }
 
 const handleScroll = () => {
-const scrollHeight = document.documentElement.scrollHeight
-const scrollTop = document.documentElement.scrollTop
-const clientHeight = document.documentElement.clientHeight
+  const scrollHeight = document.documentElement.scrollHeight
+  const scrollTop = document.documentElement.scrollTop
+  const clientHeight = document.documentElement.clientHeight
 
-// 当距离底部小于100px时触发加载
-if (scrollHeight - scrollTop - clientHeight < 100) {
-  loadMorePosts()
+  // 当距离底部小于100px时触发加载
+  if (scrollHeight - scrollTop - clientHeight < 100) {
+    loadMorePosts()
+  }
 }
-}
+
 const handleDeletePost = async (postId: string|number) => {
   try {
     const response = await remove.deletePost(postId)
@@ -105,45 +121,102 @@ const deletePost = async (event:Event,postId: string|number) => {
     })
   })
 }
-onMounted(async () => {
-try {
-  const response = await send.getPersonalPosts(page.value)
-  const posts = response.data as Post[]
-  postIntroducts.value = posts
-  hasMore.value = posts.length === pageSize
-  page.value++
-} catch(err) {
-  console.error("获取文章失败", err)
-}
 
-// 添加滚动监听
-window.addEventListener('scroll', handleScroll)
+onMounted(async () => {
+  try {
+    const response = await send.getPersonalPosts(page.value)
+    const posts = response.data as Post[]
+    postIntroducts.value = posts
+    hasMore.value = posts.length === pageSize
+    page.value++
+  } catch(err) {
+    console.error("获取文章失败", err)
+  }
+
+  // 添加滚动监听
+  window.addEventListener('scroll', handleScroll)
 })
 
 onUnmounted(() => {
-// 移除滚动监听
-window.removeEventListener('scroll', handleScroll)
+  // 移除滚动监听
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
-<style scoped>  
+<style scoped>
+.home-container {
+  display: flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 250px;
+  height: 100vh;
+  padding: 20px;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  transition: left 0.3s;
+}
+
+.sidebar h2 {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 15px;
+  margin-top: 60px;
+}
+
+.sidebar .el-menu-item {
+  border-bottom: #ccc solid 1px;
+}
+
+.sidebar .el-menu-item:last-child{
+  border-bottom: none;
+}
+
+.personal-sidebar {
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.home-posts {
+  margin-left: 220px;
+  width: calc(100% - 220px);
+  transition: margin-left 0.3s;
+}
+
+.page-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
 .article-list {
-  display: grid;
   gap: 20px;
 }
 
 .article-card {
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
   transition: transform 0.3s;
+  margin-bottom: 10px;
 }
 
 .article-card:hover {
-  transform: translateY(-3px);
-  cursor: pointer;
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .loading, .no-more {
   text-align: center;
   padding: 20px;
-  color: #909399;
+  color: #999;
+  font-size: 14px;
 }
 </style>

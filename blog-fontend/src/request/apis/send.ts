@@ -24,4 +24,11 @@ export default{
             }
         })
     },
+    getUserMark(postId: string|number ){
+        return http.get('/send/userMark', {
+            params: {
+                postId
+            }
+        })
+    },
 }
