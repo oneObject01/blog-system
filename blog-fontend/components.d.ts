@@ -8,7 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    CreatePost: typeof import('./src/components/createPost.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
@@ -25,7 +24,6 @@ declare module 'vue' {
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElTag: typeof import('element-plus/es')['ElTag']
-    HomePosts: typeof import('./src/components/homePosts.vue')['default']
     PostCard: typeof import('./src/components/postCard.vue')['default']
     PostTags: typeof import('./src/components/postTags.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

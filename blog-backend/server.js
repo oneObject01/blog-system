@@ -30,6 +30,8 @@ app.use('/update',updateRoutes)
 app.use('/send',sendRoutes)
 app.use('/delete',deleteRoutes)
 
+app.use(express.static(__dirname+'/public'))
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
