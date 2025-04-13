@@ -11,6 +11,18 @@ export interface Post {
     favoriteCount:number;
 }
 
+// ../types/type.ts
+export interface Comment {
+    _id: string;
+    author: {
+      _id: string;
+      username: string;
+    };
+    postId: string;
+    content: string;
+    createdAt: Date;
+}
+
 export interface User{
     _id: string | number;
     username: string;

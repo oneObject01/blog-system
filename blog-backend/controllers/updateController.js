@@ -1,6 +1,7 @@
 const Image = require('../models/img');
 const Post = require('../models/post');
 const User = require('../models/user');
+const Comment = require('../models/comment');
 
 const updateImage = async (req, res) => {
     try {
@@ -127,4 +128,36 @@ const updateScore = async (req, res) => {
   }
 };
 
-module.exports = { updateImage,updatePost,updateScore};
+// 新增的 updateComment 函数
+const updateComment = async (req, res) => {
+  try {
+      const { postId, content } = req.body;
+      const user = await User.findById(req.userId);
+      const post = await Post.findById(postId);
+
+      if (!user) {
+          return res.status(404).json({ success: false, message: '用户不存在' });
+      }
+      if (!post) {
+          return res.status(404).json({ success: false, message: '文章不存在' });
+      }
+
+      const comment = new Comment({
+          post: postId,
+          author: req.userId,
+          content: content
+      });
+
+      await comment.save();
+      res.json({ success: true, code: 200, message: '评论提交成功', data: comment });
+  } catch (error) {
+      res.status(500).json({
+          success: false,
+          code: 500,
+          message: '服务器内部错误',
+          error: error.message
+      });
+      console.error(error);
+  }
+};
+module.exports = { updateImage,updatePost,updateScore,updateComment};

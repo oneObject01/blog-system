@@ -9,5 +9,8 @@ export default {
     },
     updatePostScore(data: any){
         return http.post('/update/score', data)
-    }
+    },
+    updateComment(data: any){
+        return http.post('/update/comment', data)
+    },
   }

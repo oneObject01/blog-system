@@ -17,6 +17,20 @@ export default{
             }
         })
     },
+    getPersonalLikes(page: number = 1){
+        return http.get('/send/personalLikes', {
+            params: {
+                page
+            }
+        })
+    },
+    getPersonalFavorites(page: number = 1){
+        return http.get('/send/personalFavorites', {
+            params: {
+                page
+            }
+        })
+    },
     getPost(postId: string|number ){
         return http.get('/send/post', {
             params: {
@@ -31,4 +45,12 @@ export default{
             }
         })
     },
+    getComments(postId: string|number, page: number = 1){
+        return http.get('/send/comments', {
+            params: {
+                postId,
+                page
+            }
+        })
+    }
 }

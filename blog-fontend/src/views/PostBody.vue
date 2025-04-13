@@ -1,4 +1,5 @@
 <template>
+  <el-button class="back-button" :icon="ArrowLeftBold" @click="goBack" circle />
   <el-card class="article-card">
     <template #header>
       <div class="article-header">
@@ -27,24 +28,50 @@
         <span>{{ favoriteCount }}</span>
       </div>
     </div>
+    <!-- 评论输入框和提交按钮 -->
+    <div class="comment-input">
+      <el-input
+        v-model="commentContent"
+        placeholder="请输入评论内容"
+        type="textarea"
+        :rows="3"
+      ></el-input>
+      <div class="submit-button">
+        <el-button @click="submitComment">提交评论</el-button>
+      </div>
+    </div>
+    <!-- 评论列表 -->
+    <div class="comment-list">
+      <el-card v-for="(comment, index) in comments" :key="index" class="comment-card">
+        <div class="comment-meta">
+          <span>评论者：{{ comment.author.username }}</span>
+          <span>评论时间：{{ formatDate(comment.createdAt) }}</span>
+        </div>
+        <div class="comment-content">
+          {{ comment.content }}
+        </div>
+      </el-card>
+      <div v-if="loadingComments" class="loading">加载中...</div>
+      <div v-if="!hasMoreComments && comments.length > 0" class="no-more">没有更多评论了</div>
+    </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import MarkdownIt from'markdown-it';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref,onUnmounted } from 'vue';
 import 'github-markdown-css/github-markdown.css';
 import postTags from '../components/postTags.vue';
 import { StarFilled, CaretTop, CaretBottom } from '@element-plus/icons-vue';
 import send from '../request/apis/send';
 import update from '../request/apis/update';
-import { type Post } from '../types/type';
+import { type Post, type Comment } from '../types/type';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import auth from '../request/apis/auth';
 import { useUserStore } from '../stores/userStore';
-import { ca } from 'element-plus/es/locales.mjs';
+import { ArrowLeftBold } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -65,6 +92,15 @@ const updatedScore: UpdatedScore = {
   cFavoriteCount: 0
 };
 
+// 评论相关变量
+const commentContent = ref('');
+const comments = ref<Comment[]>([]);
+const loadingComments = ref(false);
+const commentPage = ref(1);
+const hasMoreComments = ref(true);
+const commentPageSize = 10;
+const commentDisabled = ref(false);
+
 type ScoreType = -1 | 0 | 1;
 // 定义更新分数的类型
 interface UpdatedScore {
@@ -72,6 +108,17 @@ interface UpdatedScore {
   cDislikeCount: ScoreType;
   cFavoriteCount: ScoreType;
 }
+
+// 格式化日期函数
+const formatDate = (date: Date | string) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}--${hours}:${minutes}`;
+};
 
 onMounted(async () => {
   try {
@@ -87,10 +134,10 @@ onMounted(async () => {
   } catch (err) {
     console.error("获取文章失败", err);
   }
-  try{
-    if(userStore.isLogin){
+  try {
+    if (userStore.isLogin) {
       const res = await send.getUserMark(route.query.postId as string);
-      console.log(res)
+      console.log(res);
       if (res.data.isLiked) {
         isLiked.value = true;
       }
@@ -101,10 +148,21 @@ onMounted(async () => {
         isFavorited.value = true;
       }
     }
-  }catch(err){
+  } catch (err) {
     console.error("获取用户标记失败", err);
   }
+  await loadComments();
+  // 添加滚动监听
+  window.addEventListener('scroll', handleScroll)
 });
+
+onUnmounted(() => {
+  // 移除滚动监听
+  window.removeEventListener('scroll', handleScroll)
+})
+const goBack = () => {
+  router.go(-1);
+};
 
 const handleAuth = async () => {
   try {
@@ -267,9 +325,78 @@ const renderedContent = computed(() => {
   const content = Array.isArray(postData.value.content)? postData.value.content[0] : postData.value.content;
   return md.render(content || '');
 });
+
+// 提交评论
+const submitComment = async () => {
+  if (!await updateScoreToAuth()) return;
+  if (commentContent.value.trim() === '') {
+    ElMessage.warning('请输入评论内容');
+    return;
+  }
+  try {
+    const res = await update.updateComment({
+      postId: route.query.postId as string,
+      content: commentContent.value
+    });
+    commentContent.value = '';
+    ElMessage.success('评论提交成功');
+    window.location.reload() 
+  } catch (err) {
+    ElMessage.error('评论提交失败');
+    console.error('评论提交失败', err);
+  }
+};
+
+// 加载评论
+const loadComments = async () => {
+  if (loadingComments.value || !hasMoreComments.value || commentDisabled.value) return;
+  loadingComments.value = true;
+  try {
+    const res = await send.getComments(route.query.postId as string, commentPage.value);
+    const newComments = res.data as Comment[];
+    if (newComments.length > 0) {
+      comments.value = [...comments.value, ...newComments];
+      hasMoreComments.value = newComments.length === commentPageSize;
+      commentPage.value++;
+    } else {
+      hasMoreComments.value = false;
+    }
+  } catch (err) {
+    console.error("获取评论列表失败", err);
+    ElMessage({
+      type: 'error',
+      message: '评论加载失败',
+    });
+    commentDisabled.value = true;
+    setTimeout(() => {
+      commentDisabled.value = false;
+    }, 2000);
+  } finally {
+    loadingComments.value = false;
+  }
+};
+
+// 滚动置底加载更多文章
+const handleScroll = () => {
+  const scrollHeight = document.documentElement.scrollHeight
+  const scrollTop = document.documentElement.scrollTop
+  const clientHeight = document.documentElement.clientHeight
+  
+  // 当距离底部小于100px时触发加载
+  if (scrollHeight - scrollTop - clientHeight < 100) {
+    loadComments()
+  }
+}
 </script>
 
 <style scoped>
+.back-button{
+  position: fixed;
+  top:90px;
+  left:150px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+}
+
 .article-card {
   margin-bottom: 20px;
 }
@@ -295,12 +422,12 @@ const renderedContent = computed(() => {
   display: flex;
   justify-content: flex-end;
   gap: 30px;
-  margin-top: 20px;
-  padding: 10px 0;
+  margin-top: 30px;
   border-top: 1px solid #eee;
 }
 
 .action-item {
+  margin-top: 30px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -320,4 +447,56 @@ const renderedContent = computed(() => {
 .action-item span {
   font-size: 14px;
 }
-</style>
+
+.comment-input {
+  margin-top: 30px;
+}
+
+.comment-input .submit-button { 
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.comment-list {
+  margin-top: 30px;
+  padding: 30px 0;
+  border-top: 1px solid #eee;
+}
+
+.comment-card {
+  margin-bottom: 20px; /* 增加评论卡片之间的间距 */
+  border-radius: 8px; /* 增加圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 增加阴影 */
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between; /* 评论元信息左右分布 */
+  align-items: center;
+  margin-bottom: 8px; /* 增加元信息和评论内容之间的间距 */
+  color: #777; /* 调整元信息颜色 */
+  font-size: 14px; /* 调整元信息字号 */
+}
+
+.comment-author {
+  font-weight: bold; /* 评论者姓名加粗 */
+}
+
+.comment-time {
+  font-style: italic; /* 评论时间斜体 */
+}
+
+.comment-content {
+  font-size: 16px; /* 调整评论内容字号 */
+  line-height: 1.6; /* 调整行高，提高可读性 */
+}
+
+.comment-list .no-more{
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 14px;
+}
+</style>    

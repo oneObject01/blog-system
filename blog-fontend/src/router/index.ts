@@ -6,6 +6,9 @@ import CreatePost from '@/views/CreatePost.vue'
 import HomePosts from '@/views/HomePosts.vue'
 import PostBody from '@/views/PostBody.vue'
 import PersonalView from '@/views/PersonalView.vue'
+import PersonalPosts from '@/views/PersonalPosts.vue'
+import PersonalFavorites from '@/views/PersonalFavorites.vue'
+import PersonalLikes from '@/views/PersonalLikes.vue'
 
 const routes = [
   { 
@@ -15,7 +18,15 @@ const routes = [
       { path: '', component: HomePosts },
       { path: 'create', component: CreatePost },
       { path: 'body', component: PostBody },
-      { path: 'personalCenter', component: PersonalView }
+      { 
+        path: 'personal', 
+        component: PersonalView,
+        children:[
+          { path: '', component: PersonalPosts },
+          { path: 'favorites', component: PersonalFavorites },
+          { path: 'likes', component: PersonalLikes },
+        ]
+      }
     ]
   },
   { path: '/login', component: LoginView },

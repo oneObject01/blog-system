@@ -1,5 +1,6 @@
 const Post = require('../models/post');
 const User = require('../models/user');
+const Comment = require('../models/comment');
 
 const limit = 10;
 
@@ -11,6 +12,38 @@ const findPostsByPage = async (page, limit = 10, query = {}) => {
       .limit(limit)
       .populate('author');
     return posts;
+};
+
+const findCommentsByPage = async (page, limit = 10, query = {}) => {
+    const skip = (page - 1) * limit;
+    const comments = await Comment.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('author');
+    return comments;
+};
+
+// 通用函数，根据操作类型获取用户对应的文章列表
+const sendUserActionPosts = async (req, res, actionField) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ error: '用户不存在' });
+        }
+        const postIds = user[actionField];
+        console.log(postIds);
+        const posts = await findPostsByPage(page, limit, { _id: { $in: postIds } });
+        console.log(posts);
+        res.status(200).json({
+            success: true,
+            data: posts,
+            message: `${actionField} 文章发送成功`
+        });
+    } catch (error) {
+        res.status(500).json({ error: `${actionField} 文章发送失败` });
+    }
 };
 
 const sendPosts = async (req, res) => {
@@ -135,9 +168,42 @@ const sendUserMark = async (req, res) => {
     }
 }
 
+// 发送用户点赞的文章
+const sendLikedPosts = async (req, res) => {
+    await sendUserActionPosts(req, res, 'likedPosts');
+};
+
+// 发送用户收藏的文章
+const sendFavoritePosts = async (req, res) => {
+    await sendUserActionPosts(req, res, 'favoritePosts');
+};
+
+const sendComments = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const postId = req.query.postId;
+
+        if (!postId) {
+            return res.status(400).json({ error: '文章 ID 不能为空' });
+        }
+
+        const comments = await findCommentsByPage(page, limit, { post: postId });
+
+        res.status(200).json({
+            success: true,
+            data: comments,
+            message: '评论加载成功'
+        });
+    } catch (error) {
+        res.status(500).json({ error: '评论加载失败' });
+    }
+};
 module.exports = {
     sendPosts,
     sendPost,
     sendPersonalPosts,
-    sendUserMark
+    sendUserMark,
+    sendLikedPosts,
+    sendFavoritePosts,
+    sendComments,
 };

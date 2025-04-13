@@ -6,6 +6,7 @@ const authenticate = require('../middlewares/authenticates')
 router.post('/image',authenticate,update.updateImage);
 router.post('/post',authenticate,update.updatePost);
 router.post('/score',authenticate,update.updateScore);
+router.post('/comment',authenticate,update.updateComment);
 
 
 module.exports = router;

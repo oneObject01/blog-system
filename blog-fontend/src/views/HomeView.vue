@@ -86,7 +86,7 @@
   }
 };
 
-const toPersonalCenter = () => handleAuthAndNavigate('/personalCenter');
+const toPersonalCenter = () => handleAuthAndNavigate('/personal');
 const toCreatePost = () => handleAuthAndNavigate('/create');
 
   const logout = async()=>{
