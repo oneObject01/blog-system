@@ -101,7 +101,7 @@ interface ApiResponse<T = any> {
       } else if (error.message.includes('Network Error')) {
         errMessage = '网络连接异常'
       }
-      // ElMessage.error(errMessage)
+      ElMessage.error(errMessage)
       return Promise.reject(error)
     }
   )

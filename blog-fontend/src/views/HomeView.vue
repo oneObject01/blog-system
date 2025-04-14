@@ -9,8 +9,8 @@
         
         <div class="nav-menu">
           <router-link to="/">首页</router-link>
-          <router-link to="/articles">文章</router-link>
-          <router-link to="/about">关于</router-link>
+          <!-- <router-link to="/articles">文章</router-link>
+          <router-link to="/about">关于</router-link> -->
         </div>
         
         <div class="user-panel">

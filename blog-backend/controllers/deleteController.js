@@ -15,7 +15,7 @@ const deletePost = async (req, res) => {
     res.status(500).json({
       success: false, 
       code: 500, 
-      message: '服务器内部错误', 
+      message: '服务器错误，请稍后再试', 
       error: error.message 
     });
   }
